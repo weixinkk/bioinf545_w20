@@ -14,7 +14,7 @@ manifest = pd.read_csv(config["manifest"],sep="\t")
 FTP = FTPRemoteProvider()
 
 rule all:
-    input: expand(str(int_dir / "quant" / "{SRR_ID}" / "abundances.tsv"),SRR_ID=manifest["SRR"])
+    input: expand(str(int_dir / "quant" / "{SRR_ID}" / "abundance.tsv"),SRR_ID=manifest["SRR"])
 
 rule fastq_dump:
     output: 
@@ -40,11 +40,11 @@ rule kallisto_quant:
         R2=str(int_dir / "fastqs" / "{SRR_ID}" / "{SRR_ID}_2.fastq.gz"),
         index=str(int_dir/"reference_index.idx")
     output:
-        h5=str(int_dir / "quant" / "{SRR_ID}" / "abundances.h5"),
-        abundance=str(int_dir / "quant" / "{SRR_ID}" / "abundances.tsv"),
+        h5=str(int_dir / "quant" / "{SRR_ID}" / "abundance.h5"),
+        abundance=str(int_dir / "quant" / "{SRR_ID}" / "abundance.tsv"),
         run_info=str(int_dir / "quant" / "{SRR_ID}" / "run_info.json")
     shell:
         """
         mkdir -p $(dirname {output.h5})
-        kallisto quant -i {input.index} -o $(dirname output.h5) {input.R1} {input.R2}
+        kallisto quant -i {input.index} -o $(dirname {output.h5}) {input.R1} {input.R2}
         """
