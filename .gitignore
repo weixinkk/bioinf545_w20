@@ -1,0 +1,5 @@
+work/intermediate
+work/output
+.snakemake
+*.DS_Store*
+.vscode/

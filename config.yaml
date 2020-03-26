@@ -1,0 +1,4 @@
+manifest: "work/input/sample_manifest.tsv"
+intermediate_dir: "work/intermediate"
+output_dir: "work/output/"
+reference: "ftp://ftp.ensembl.org/pub/grch37/release-98/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh37.cdna.all.fa.gz"

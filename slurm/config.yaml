@@ -1,0 +1,4 @@
+# Set up to run on a slurm cluster
+cluster: "sbatch"
+jobs: 100
+use-conda: true
