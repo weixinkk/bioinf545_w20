@@ -1,5 +1,7 @@
 name: b545proj
 channels:
+  - bioconda
+  - conda-forge
   - defaults
 dependencies:
   - sra-tools
