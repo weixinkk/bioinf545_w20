@@ -20,7 +20,9 @@ FTP = RemoteProvider()
 
 rule all:
     input:
-        expand(str(int_dir / "quant" / "{SRR_ID}" / "abundance.tsv"),SRR_ID=manifest["SRR"])
+        expand(str(int_dir / "quant" / "{SRR_ID}" / "abundance.tsv"),SRR_ID=manifest["SRR"]),
+	expand(str(int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_1.html"),SRR_ID=manifest["SRR"]),
+	expand(str(int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_2.html"),SRR_ID=manifest["SRR"])
 
 rule fastq_dump:
     output:
@@ -35,16 +37,16 @@ rule fastq_dump:
 rule fastqc:
     input:
         R1 = int_dir / "fastqs" / "{SRR_ID}" / "{SRR_ID}_1.fastq.gz",
-        R2 = int_dir / "fastqs" / "{SRR_ID}" / "{SRR_ID}_2.fastq.gz",
+        R2 = int_dir / "fastqs" / "{SRR_ID}" / "{SRR_ID}_2.fastq.gz"
     output:
-        fastqc_1 = int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_1.fastq" /,
-        fastqc_2 = int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_2.fastq" /,
+        fastqc_1 = int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_1.html",
+	fastqc_2 = int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_2.html"
     shell:
         """
-        mkdir -p $(dirname {fastqc_1})
-        mkdir -p $(dirname {fastqc_2})
-        fastqc -o {output.fastqc_1} {input.R1}
-        fastqc -o {output.fastqc_2} {input.R2}
+        mkdir -p $(dirname {output.fastqc_1})
+        mkdir -p $(dirname {output.fastqc_2})
+        fastqc -o $(dirname {output.fastqc_1}) {input.R1}
+        fastqc -o $(dirname {output.fastqc_2}) {input.R2}
         """
         
 rule kallisto_make_index:
