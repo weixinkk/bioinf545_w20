@@ -21,8 +21,8 @@ FTP = RemoteProvider()
 rule all:
     input:
         expand(str(int_dir / "quant" / "{SRR_ID}" / "abundance.tsv"),SRR_ID=manifest["SRR"]),
-	expand(str(int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_1.html"),SRR_ID=manifest["SRR"]),
-	expand(str(int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_2.html"),SRR_ID=manifest["SRR"])
+	expand(str(int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_1_fastqc.html"),SRR_ID=manifest["SRR"]),
+	expand(str(int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_2_fastqc.html"),SRR_ID=manifest["SRR"])
 
 rule fastq_dump:
     output:
@@ -39,8 +39,8 @@ rule fastqc:
         R1 = int_dir / "fastqs" / "{SRR_ID}" / "{SRR_ID}_1.fastq.gz",
         R2 = int_dir / "fastqs" / "{SRR_ID}" / "{SRR_ID}_2.fastq.gz"
     output:
-        fastqc_1 = int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_1.html",
-	fastqc_2 = int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_2.html"
+        fastqc_1 = int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_1_fastqc.html",
+	fastqc_2 = int_dir / "fastqc" / "{SRR_ID}" / "{SRR_ID}_2_fastqc.html"
     shell:
         """
         mkdir -p $(dirname {output.fastqc_1})
