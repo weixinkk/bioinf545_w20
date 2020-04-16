@@ -80,12 +80,19 @@ s_obj <- sleuth_prep(
   gene_mode=TRUE
 )
 ```
+## QC
+
+```{r}
+plot_mean_var(s_obj) +
+  labs(title="Mean Variance Relationship")
+```
+
 
 ## PCA 
 
 ### Sleuth default
 ```{r}
-plot_pca(s_obj,units="scaled_reads_per_base",color_by = "Response") + geom_label(aes(label=sample),size=3)
+plot_pca(s_obj,units="scaled_reads_per_base",color_by = "Response")
 ```
 
 ### Standardized PCA
@@ -101,8 +108,8 @@ sleuth_std_pca$x[,1:2] %>%
   rownames_to_column("SRR") %>%
   left_join(samples,by="SRR") %>%
   ggplot(aes(x=PC1,y=PC2,color=Response,label=SRR)) +
-    geom_point() +
-    geom_label(size=2)
+    geom_point() 
+   # geom_label(size=2)
 ```
 
 ## Diffex
@@ -147,9 +154,16 @@ txi <- tximport(
 deseq_kallisto_data <- DESeqDataSetFromTximport(txi,samples_filt,~Response)
 
 ```
+
+## QC
+```{r}
+deseq_kallisto_norm <- vst(deseq_kallisto_data)
+meanSdPlot(assay(deseq_kallisto_norm),ranks=FALSE)
+```
+
+
 ## PCA
 ```{r}
-deseq_kallisto_norm <- vst(deseq_kallisto_data,blind=TRUE,nsub = 20000)
 plotPCA(deseq_kallisto_norm,intgroup="Response")
 ```
 ## Difex
@@ -171,9 +185,16 @@ fc_mat <- read_tsv("../work/input/GSE126044_counts.txt")
    select(one_of(samples_filt$`Patient ID`))
 deseq_fc <- DESeqDataSetFromMatrix(countData=fc_mat,colData=samples_filt,design=~Response)
 ```
-## PCA
+
+## QC
 ```{r}
 deseq_fc_norm <- vst(deseq_fc)
+meanSdPlot(assay(deseq_fc_norm),rank=FALSE)
+```
+
+
+## PCA
+```{r}
 plotPCA(deseq_fc_norm,intgroup="Response")
 ```
 
