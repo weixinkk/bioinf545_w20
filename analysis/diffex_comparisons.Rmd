@@ -208,3 +208,35 @@ deseq_fc_lrt %>%
   select(row,log2FoldChange,pvalue,padj)
 ```
 
+## counts_to_rpm, pca
+
+fc_mat <- read_tsv("/Users/.../Documents/GSE126044_counts.txt")
+tfc<- as.data.frame(t(fc_mat[,-1]))
+colnames(tfc) <- fc_mat$X1
+# Convert Kallisto counts to rpm
+kalread<-cbind(kallisto_est_mapped, sleuth_rna_norm)
+kalrpm<-setDT(kalread) [, lapply(.SD, function(x) (x * 1e6) / (kallisto_mapped_reads)),  by=.(kallisto_mapped_reads,sample)] %>% 
+  column_to_rownames("sample")
+
+# Convert star fc to rpm
+#get df with est total reads for star
+star_est_mapped<-data.frame(colSums(fc_mat[-1]), c("Dis_01", "Dis_02", "Dis_11", "Dis_12", "Dis_15", "Dis_04", "Dis_16",
+                                      "Dis_17", "Dis_03", "Dis_07", "Dis_10", "Dis_18", "Dis_09","Dis_05", "Dis_06","Dis_08"))
+colnames(star_est_mapped)<-c("star_est_mapped", "sample")
+staread<-cbind(star_est_mapped, tfc)
+starpm<-setDT(staread) [, lapply(.SD, function(x) (x * 1e6) / (star_est_mapped)),  by=.(star_est_mapped,sample)] %>%
+  column_to_rownames("sample")
+
+## scale pca with rpm
+kal_rpm_pca <- prcomp(kalrpm[,-1],center=TRUE,scale.=TRUE)
+
+starnorm_std <- scale(starpm[,-1])
+#star counts include some zero, set scale/std apply to those !=0
+star_rpm_pca <- prcomp(starnorm_std[ , which(apply(starnorm_std, 2, var) != 0)],center=TRUE)
+
+## superimposed pca plots from the two sources
+p1<-kal_rpm_pca$x[,1:2] %>% as.data.frame()
+p2<-star_rpm_pca$x[,1:2] %>% as.data.frame()
+ggplot()+geom_point(data=p1,aes(x=PC1,y=PC2, color='Kallisto')) + geom_point(data=p2,aes(x=PC1,y=PC2,color='STAR')) + scale_colour_manual(name="Dataset",values=c(Kallisto="blue", STAR="red"))
+
+
